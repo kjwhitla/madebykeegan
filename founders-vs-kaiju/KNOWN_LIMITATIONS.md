@@ -1,15 +1,28 @@
 # Known Prototype Limitations — HTML v0.2
 
-The rules-fidelity branch closes most of the original “text exists but behavior is simplified” gap.
+The P0 rules-fidelity pass now uses an explicit queued resolver for Advance entry effects, Wave movement/impact, District deterioration, Fortification capacity, and nested player choices.
 
-Remaining limitations are primarily **nested trigger ordering**:
+The previously blocking P0 cases are covered by deterministic regression scenarios:
 
-1. **Multiple simultaneous Wave reactions.** W10, W17, W18, K14 and District Breach effects need regression tests when several could fire during the same Wave movement.
-2. **Orderly Retreat on Ruin.** Washington's fallback movement is implemented. Moving a companion Fortification inward while the same Ruin event is removing defenses still needs exact nested-choice handling.
-3. **Lafayette at full capacity.** Free Fortify and entry movement are implemented; replacement-at-capacity needs a dedicated regression case.
-4. **Nested hand-limit decisions.** The engine supports finite hand limits, but draw/return effects that immediately create another choice need focused tests.
-5. **Trigger ordering UI.** The engine currently resolves the deterministic order encoded in the prototype. It does not yet ask the player to order two optional simultaneous triggers.
+- W10 + W18 simultaneous Wave prevention;
+- K14 Deep Current + D03 River Crossing + two Fortifications;
+- W12 Orderly Retreat on Ruin;
+- W12 companion movement into a full destination;
+- W16 Lafayette free Fortify at capacity / Gate-shaper replacement;
+- False Works return + draw hand-limit cleanup;
+- Market Ward nested draw / hand-limit cleanup;
+- Abigail Adams Wave-Breach draw / hand-limit cleanup;
+- K10 post-Advance draw / hand-limit cleanup;
+- Signal Beacon interrupting a Signature play;
+- K15 draw after an actual queued Wave Breach.
 
-These are **software fidelity issues**, not open board-game design questions.
+## Remaining limitations
 
-See `IMPLEMENTATION_MATRIX.md` before using a specific interaction as balance evidence.
+1. **Two tabletop wording conventions still need confirmation.** See `RULES_QUESTIONS.md` for River Crossing's extra-discard chooser and W10/W18 simultaneous prevention ordering.
+2. **The trigger queue is explicit for the current v0.2 card set, not a generic future-card rules language.** New cards with new timing windows will still need an intentional trigger descriptor.
+3. **No automated CI/browser runner yet.** The deterministic browser smoke page is checked into the repository, but it is still run manually by serving the static prototype.
+4. **Runtime engine/UI fragments remain technical debt.** The connector-friendly `part-XX.txt` bundles should eventually be consolidated into normal JavaScript modules after the playtest branch stabilizes.
+
+These are not reasons to redesign the tabletop game.
+
+For first human playtesting, use the current rules conventions consistently and record any moment where the timing feels unintuitive.
