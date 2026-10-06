@@ -31,6 +31,16 @@ http://localhost:8080/founders-vs-kaiju/
 
 Do not rely on opening `index.html` directly from `file://`.
 
+### Engine regression page
+
+Open:
+
+```text
+http://localhost:8080/founders-vs-kaiju/smoke-test.html
+```
+
+This runs deterministic rules-engine checks for the core race geometry, turn continuation, card ordering, Evolution search, Fortification legality, K17 Overrun substitution, and the City Core final Response.
+
 ## v0.2 engineering goals
 
 ### 1. Rules fidelity
