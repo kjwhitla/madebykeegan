@@ -1,0 +1,38 @@
+4':seen=look('kaiju',4);eligible=seen.filter(x=>(card(x).tags||[]).includes('TIDE'));s.choice={kind:'pick',who:'kaiju',ids:eligible,purpose:'k14_tide_top',seen,prompt:'Deep Current: choose a TIDE card to put on top; reorder the rest.'};break;
+ case'K16':seen=look('kaiju',3);eligible=seen.filter(x=>card(x).kind==='core');pickFromLook(seen,eligible,'kaiju','take_core_bottom_rest',finish);break;
+ case'K17':seen=look('kaiju',4);eligible=seen.filter(x=>!!card(x).evolution);pickFromLook(seen,eligible,'kaiju','k17_take_reorder_rest',finish);break;
+ case'K18':seen=look('kaiju',5);eligible=seen.filter(x=>(card(x).tags||[]).includes('TIDE'));pickFromLook(seen,eligible,'kaiju','take_tide_bottom_rest',finish);break;
+ default:finish();
+ }}
+function setOrderChoice(ids,who,purpose){if(ids.length<2){putTop(who,ids);return}s.choice={kind:'order',who,ids,purpose,prompt:'Choose the order. First selected will be the top card.'}}
+function pickKeepBottom(seen,who){if(!seen.length)return;if(seen.length===1){s[who].hand.push(seen[0]);limit(who);return}s.choice={kind:'pick',who,ids:seen,purpose:'keep_one_bottom_rest',seen,prompt:'Choose 1 card to keep; put the other on the bottom.'}}
+function pickFromLook(seen,eligible,who,purpose){if(!eligible.length){putBottom(who,seen);return}s.choice={kind:'pick',who,ids:eligible,purpose,seen,prompt:'Choose 1 eligible card.'}}
+function resolveManifest(id){const next=inward(s.kaiju.location),a=area(next);
+ switch(id){
+ case'K01':{const w=s.waves.active[0];if(w)moveWave(w);break}
+ case'K02':if(a.forts.length)s.choice={kind:'pick',who:'kaiju',ids:[...a.forts],purpose:'k02_return_fort',loc:next,prompt:'Scent Weakness: choose a Fortification to return to Washington hand.'};break;
+ case'K03':startAdvance({bonusForce:1,source:'Gathering Mass',fromCard:true});break;
+ case'K04':if(s.washington.location===next)s.washington.location=inward(s.washington.location);break;
+ case'K05':startAdvance({ignoreOne:1,source:'Relentless Drive',postDamage:1,fromCard:true});break;
+ case'K06':if(a.state==='breached'&&a.forts.length)s.choice={kind:'pick',who:'kaiju',ids:[...a.forts],purpose:'k06_discard_fort',loc:next,prompt:'Feint in the Deep: choose a Fortification to discard.'};break;
+ case'K07':moveWaves();break;
+ case'K08':if(a.state==='breached')startAdvance({reduceChosen:1,source:'Crush the Weak Point',fromCard:true});break;
+ case'K09':{const ids=s.kaiju.discard.filter(x=>card(x).kind==='signature');if(ids.length)s.choice={kind:'pick',who:'kaiju',ids,purpose:'k09_retrieve_signature',prompt:'Ancient Memory: choose a Signature card to return to hand.'};break}
+ case'K10':startAdvance({bonusForce:1,source:'Unstoppable Momentum',postDamage:1,postDraw:2,fromCard:true});break;
+ case'K11':if(a.forts.length>=2)s.choice={kind:'pick',who:'kaiju',ids:[...a.forts],purpose:'k11_discard_fort',loc:next,prompt:'Read the Terrain: choose a Fortification to discard.'};break;
+ case'K13':startAdvance({bonusForce:2,source:'Broken Chains',fromCard:true});break;
+ case'K14':moveWaves();break;
+ case'K15':if(s.waves.active.length)s.choice={kind:'pick',who:'kaiju',ids:s.waves.active.map(w=>w.name),purpose:'k15_move_wave',prompt:'Rising Water: choose a Wave to move 1.'};break;
+ case'K16':if(s.washington.location===s.kaiju.location||s.washington.location===next)s.washington.location=inward(s.washington.location);break;
+ case'K17':{const slots=Object.entries(s.kaiju.evolutions).filter(([,v])=>v).map(([k])=>k);if(slots.length)s.choice={kind:'pick',who:'kaiju',ids:slots,purpose:'k17_sac_evo',prompt:'Tidal Carapace: choose an installed Evolution to discard and restore 1 Health.'};break}
+ case'K18':if(s.waves.active.some(w=>w.location===next))startAdvance({reduceChosen:1,source:'Undertow Engine',fromCard:true});break;
+ }}
+function adaptDraw(){if(s.phase!=='kaiju_adapt'||s.choice)return;draw('kaiju',1);if(!s.choice)endAdapt()}
+function evolve(id){if(s.phase!=='kaiju_adapt'||s.kaiju.dormant||s.choice)return;const c=card(id);if(!c.evolution)return;discard('kaiju',id);const old=s.kaiju.evolutions[c.evolution.slot];if(old){s.kaiju.discard.push(old);s.metrics.evolutionsReplaced++}s.kaiju.evolutions[c.evolution.slot]=id;s.metrics.evolutions++;recordStrategy(c,'evolve');log('evolution',c.name+' installed in '+c.evolution.slot+'.');endAdapt()}
+function strikeRange(){if(s.kaiju.dormant||s.kaiju.location==='approach')return[];const k=s.kaiju.location;if(k==='breach')return['breach'];if(k==='district2')return['district2','district1'];if(k==='district1')return['district2','district1','cityCore'];return['district1','cityCore']}
+function canStrike(){if(strikeRange().includes(s.washington.location))return true;return area(s.washington.location).districtId==='D04'&&adj(s.washington.location,s.kaiju.location)}
+function strike(){if(s.phase!=='washington_response'||s.choice||!canStrike())return;const prior=s.log.filter(e=>e.exchange===s.exchange&&e.type==='strike').length;if(!s.finalResponse&&prior>=FVK.CONFIG.strikeLimit)return;const hasKnox=area(s.washington.location).forts.includes('W15');if(hasKnox){s.choice={kind:'yesno',who:'washington',purpose:'knox_strike',prompt:'Henry Knox: discard this Fortification for +1 damage and adjacent range?'};return}resolveStrike(1)}
+function resolveStrike(dmg){s.metrics.strikes++;log('strike','Washington Strikes for '+dmg+'.');damage(dmg,'Strike');if(!s.winner)endWashingtonAction();emit()}
+function moveWashington(dir,steps=1){if(s.phase!=='washington_response'||s.choice)return;for(let i=0;i<steps;i++){const d=dir==='inward'?inward(s.washington.location):outward(s.washington.location);if(d==='approach'||d===s.washington.location)break;s.washington.location=d}log('move','Washington moves to '+s.washington.location+'.');endWashingtonAction();emit()}
+function rally(){if(s.phase!=='washington_response'||s.choice||!s.washington.deck.length)return;const n=area(s.washington.location).forts.includes('W14')?3:2,seen=s.washington.deck.splice(0,Math.min(n,s.washington.deck.length));s.metrics.rallies++;s.choice={kind:'pick',who:'washington',ids:seen,purpose:'rally',seen,prompt:'Rally: choose 1 card to keep; bottom the rest.'};emit()}
+function playWashington(id,mode){if(s.phase!=='washington_response'||s.choice)return;const c=card(id);s.activeAction={actor:'washington',card:id,mode};if(mode==='fortify'){const v=validFortify(id);if(!v.ok)return;if(v.replace){s.choice={kind:'pick',who:'washington',ids:[...area(s.washington.location).forts],purpose:'replace_fort',loc:s.washington.location,newFort:id,prompt:'Area is at c
