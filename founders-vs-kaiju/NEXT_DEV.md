@@ -8,6 +8,16 @@ The prototype should now move from **rules-fidelity candidate** to **trusted hum
 
 The next work is engineering and playtesting, not another structural board-game design pass.
 
+## Current status
+
+**P0 — Rules Fidelity: COMPLETE for the current v0.2 card set.**
+
+The engine now pauses and resumes explicit trigger steps instead of continuing resolution behind player-choice modals. W12, W16, simultaneous Wave prevention, nested hand-limit cleanup, Signal Beacon interruption, and K15 queued Breach drawing have regression coverage.
+
+Two non-structural wording conventions remain in `RULES_QUESTIONS.md`.
+
+**ACTIVE NEXT: P1 — FVCK! story / playtest UX.**
+
 ---
 
 ## Design / Story Rule
@@ -56,7 +66,7 @@ This is **presentation only**. Do not create a cadence meter, cadence resource, 
 
 ---
 
-# P0 — CLOSE RULES-FIDELITY RISKS
+# P0 — COMPLETE: RULES-FIDELITY RISKS
 
 Do this before treating unusual game results as balance evidence.
 
