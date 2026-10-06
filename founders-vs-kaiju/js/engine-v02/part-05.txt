@@ -1,0 +1,35 @@
+oy_wave_here':case'destroy_wave_any':{const w=s.waves.active.find(x=>x.name===one);if(w)destroyWave(w,c.source||'Washington')}break;
+ case'w05_move_fort':{removeFort(c.loc,one);const dest=inward(c.loc),a=area(dest);a.forts.push(one);while(a.forts.length>capacity(dest)){const lost=a.forts.shift();s.washington.discard.push(lost)}break}
+ case'w06_return_fort':removeFort(c.loc,one,true);draw('washington',1);break;
+ case'w09_move':{const [dir,n]=one.split('-');for(let i=0;i<+n;i++){const d=dir==='inward'?inward(s.washington.location):outward(s.washington.location);if(d==='approach'||d===s.washington.location)break;s.washington.location=d}break}
+ case'w12_return_fort':removeFort(c.loc,one,true);break;
+ case'w14_take_bottom':s.washington.hand.push(one);putBottom('washington',c.seen.filter(x=>x!==one));limit('washington');break;
+ case'w15_discard_one':discard('washington',one);limit('washington');break;
+ case'w17_choose_keep':s.washington.hand.push(one);{const other=c.seen.find(x=>x!==one);s.choice={kind:'pick',who:'washington',ids:['top','bottom'],purpose:'w17_place_other',other,prompt:'Abigail Adams: place the other card on top or bottom.'};emit();return}
+ case'w17_place_other':if(one==='top')putTop('washington',[c.other]);else putBottom('washington',[c.other]);limit('washington');break;
+ case'w16_command_move':s.washington.location=one;s.choice={kind:'yesno',who:'washington',purpose:'w16_free_fortify',prompt:'Lafayette: Fortify the new area for free?'};emit();return;
+  case'rally':s.washington.hand.push(one);putBottom('washington',c.seen.filter(x=>x!==one));limit('washington');break;
+ case'market_ward':case'w17_wave_breach':s.washington.hand.push(one);putBottom('washington',c.ids.filter(x=>x!==one));limit('washington');break;
+ case'w16_entry_move':s.washington.location=one;removeFort(c.loc,'W16');break;
+ }
+ s.choice=null;resume();emit()
+}
+function resolveYesNo(yes){const c=s.choice;if(!c||c.kind!=='yesno')return;s.choice=null;switch(c.purpose){
+case'k10_cycle':if(yes&&s.kaiju.hand.length){s.choice={kind:'pick',who:'kaiju',ids:[...s.kaiju.hand],purpose:'k10_bottom_choice',prompt:'Choose a hand card to bottom, then draw 1.'};emit();return}else limit('kaiju');break;
+case'w05_discard_or_damage':case'w07_discard_or_damage':if(yes&&s.kaiju.hand.length){s.choice={kind:'pick',who:'kaiju',ids:[...s.kaiju.hand],purpose:c.purpose+'_pick',prompt:'Choose 1 card to discard.'};emit();return}else damage(1,c.purpose.startsWith('w05')?'Field Barricades':'Chevaux-de-Frise');break;
+case'w13_scorch':if(yes){ruinDistrict(c.loc);damage(2,'Scorched Ground');removeFort(c.loc,'W13')}break;
+case'd06_move_in':if(yes)s.washington.location=c.loc;break;
+case'knox_strike':if(yes){removeFort(s.washington.location,'W15');resolveStrike(2);return}else{resolveStrike(1);return}
+case'k10_cycle_limit':limit('kaiju');break;
+case'w16_free_fortify':if(yes){const ids=s.washington.hand.filter(id=>!!card(id).fortify);if(ids.length){s.choice={kind:'pick',who:'washington',ids,purpose:'w16_choose_free_fort',prompt:'Choose a card to Fortify here for free.'};emit();return}}break;
+}
+resume();emit()}
+function resolveSpecialPick(id){const c=s.choice;if(!c)return;if(c.purpose==='k10_bottom_choice'){const i=s.kaiju.hand.indexOf(id);if(i>=0){s.kaiju.hand.splice(i,1);putBottom('kaiju',[id]);rawDraw('kaiju',1);limit('kaiju')}}else if(c.purpose==='w05_discard_or_damage_pick'||c.purpose==='w07_discard_or_damage_pick')discard('kaiju',id);else if(c.purpose==='w16_choose_free_fort'){const v=validFortify(id);if(v.replace){s.choice={kind:'pick',who:'washington',ids:[...area(s.washington.location).forts],purpose:'w16_replace_free',newFort:id,loc:s.washington.location,prompt:'Choose a Fortification to replace.'};emit();return}installFort(id,s.washington.location)}else if(c.purpose==='w16_replace_free'){removeFort(c.loc,id);installFort(c.newFort,c.loc)}s.choice=null;resume();emit()}
+function dismissInfo(){if(s.choice?.kind==='info'){s.choice=null;resume();emit()}}
+function resume(){if(s.choice||s.pending||s.winner)return;if(s.activeAction?.actor==='kaiju')completeKaijuAct();else if(s.activeAction?.actor==='washington')endWashingtonAction()}
+function markFeedback(kind){if(s.metrics.feedback[kind]!=null)s.metrics.feedback[kind]++;log('feedback','Playtester marked '+kind+'.') ;emit()}
+function exportJSON(){return JSON.stringify({state:s,summary:getSummary()},null,2)}
+function getSummary(){return{winner:s.winner,exchange:s.exchange,seed:s.seed,awakening:s.metrics.awakening,firstAwakenCapable:s.metrics.firstAwakenCapable,dormantActs:s.metrics.dormantActs,healthByEntry:s.metrics.healthByEntry,routes:s.metrics.routes,strikes:s.metrics.strikes,strikeDamage:s.metrics.strikeDamage,evolutions:s.metrics.evolutions,evolutionsReplaced:s.metrics.evolutionsReplaced,wavesCreated:s.metrics.wavesCreated,wavesDestroyed:s.metrics.wavesDestroyed,wavesBreached:s.metrics.wavesBreached,fortificationsInstalled:s.metrics.fortificationsInstalled,fortificationsReplaced:s.metrics.fortificationsReplaced,rallies:s.metrics.rallies,commands:s.metrics.commands,strategies:{body:s.metrics.bodyBehaviors,tide:s.metrics.tideBehaviors,instinct:s.metrics.instinctBehaviors},feedback:s.metrics.feedback,depletion:s.depletion}}
+function debug(action,p={}){if(action==='health')s.kaiju.health=+p.value;if(action==='kaijuLocation')s.kaiju.location=p.value;if(action==='washingtonLocation')s.washington.location=p.value;if(action==='addWave')createWave();if(action==='phase')s.phase=p.value;emit()}
+return{L,start,subscribe,getState:()=>s,chooseDistrict,card,district,gate,capacity,validFortify,canAwaken,awaken,playKaiju,startAdvance,cancelAdvance,chooseRoute,togglePay,setCarapace,summary,confirmAdvance,adaptDraw,evolve,canStrike,strike,moveWashington,rally,playWashington,resolveChoice,resolveYesNo,resolveSpecialPick,dismissInfo,markFeedback,exportJSON,getSummary,debug}
+})();
