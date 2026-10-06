@@ -24,7 +24,7 @@ Status:
 | K11 Read the Terrain | ✅ find ADAPT | ✅ remove Fortification from 2-card defense | ✅ |
 | K12 Hardened Hide | ✅ find Evolution | — | ✅ BODY |
 | K13 Broken Chains | ✅ find FORCE/TIDE | ✅ immediate Advance + 2 FORCE | ✅ HEAD |
-| K14 Deep Current | ✅ TIDE setup | ✅ move all Waves | 🟡 TAIL choice works; simultaneous Wave triggers need ordering tests |
+| K14 Deep Current | ✅ TIDE setup | ✅ queued Wave movement | ✅ TAIL capacity choice + D03 ordering covered |
 | K15 Rising Water | ✅ draw 2 / keep 1 | ✅ move chosen Wave + Breach draw | ✅ |
 | K16 Imperial Roar | ✅ find Core card | ✅ push Washington | ✅ HEAD +1 look |
 | K17 Tidal Carapace | ✅ find Evolution | ✅ sacrifice Evolution / heal | ✅ BODY Overrun substitution |
@@ -45,11 +45,11 @@ Status:
 | W09 Forced March | ✅ move up to 2 | ✅ fallback |
 | W10 Emergency Repairs | ✅ repair Breach | ✅ prevent Wave impact |
 | W11 Continental Volley | ✅ ranged damage | ✅ entry crossfire |
-| W12 Orderly Retreat | ✅ retreat + recover Fortification | 🟡 Washington fallback works; companion Fortification movement on Ruin still needs exact nested-choice handling |
+| W12 Orderly Retreat | ✅ retreat + recover Fortification | ✅ Ruin fallback + companion move + destination legality |
 | W13 Scorched Ground | ✅ shared-District Command | ✅ Breached entry scorch |
 | W14 Benjamin Franklin | ✅ top 3 / keep 1 | ✅ Rally looks 3 |
 | W15 Henry Knox | ✅ draw 2 / discard 1 | ✅ optional boosted Strike |
-| W16 Marquis de Lafayette | ✅ move + optional free Fortify | 🟡 entry movement works; replacement-at-capacity requires regression testing |
+| W16 Marquis de Lafayette | ✅ move + optional free Fortify | ✅ capacity / Gate-shaper replacement covered |
 | W17 Abigail Adams | ✅ draw 2 / keep 1 / top-bottom other | ✅ Wave-Breach draw choice |
 | W18 John Paul Jones | ✅ destroy Wave at Breach/DII | ✅ pre-impact Wave destruction |
 
@@ -80,16 +80,28 @@ Status:
 ✅ Evolution replacement  
 ✅ deck depletion behavior  
 ✅ structured log + JSON export  
+✅ explicit queued trigger resolution  
+✅ nested hand-limit continuation  
+✅ simultaneous W10 / W18 prevention ordering UI  
+✅ W12 Ruin companion movement  
+✅ W16 legal replacement at capacity  
 ✅ playtest markers: Tense / Obvious / Confusing
 
-## Remaining engineering risk
+## P0 fidelity status
 
-The remaining risk is **trigger ordering**, not missing strategic systems. Before trusting balance data from edge-case games, regression-test:
+The previously blocking trigger-ordering cases now have explicit queued resolution and deterministic regression coverage.
 
-1. multiple Waves entering a defended District with W10/W17/W18;
+Covered:
+
+1. W10 / W18 simultaneous Wave prevention;
 2. K14 Deep Current + D03 River Crossing + two Fortifications;
-3. W12 Orderly Retreat when Ruin also removes multiple defenses;
-4. W16 Lafayette when destination is already at capacity;
-5. hand-limit choices nested inside draw/return effects.
+3. W12 Orderly Retreat during Ruin, including companion Fortification movement;
+4. moved Fortification capacity / Gate-shaper legality;
+5. W16 Lafayette free Fortify at a full destination;
+6. nested hand-limit continuation for Washington and Kaiju card-gain paths;
+7. Signal Beacon pausing and resuming a Signature play;
+8. K15 Rising Water drawing from the actual queued Breach event.
 
-Do not redesign tabletop rules to solve these implementation issues.
+Two **non-structural tabletop wording conventions** remain documented in `RULES_QUESTIONS.md`.
+
+Do not redesign tabletop rules to solve software implementation issues.
