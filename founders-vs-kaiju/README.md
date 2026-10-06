@@ -6,6 +6,8 @@ This branch is the **Complete Rules Fidelity + Playtest UX** engineering pass. I
 
 **Current status:** P0 rules fidelity and P1 FVCK presentation are complete for the first human playtest build. The active next phase is a 5–10 game rules freeze.
 
+Use **[PLAYTEST_PROTOCOL.md](PLAYTEST_PROTOCOL.md)** for the first human playtest block. Track the block in GitHub Issue #2.
+
 ## Source of truth
 
 Working tabletop rules:  
