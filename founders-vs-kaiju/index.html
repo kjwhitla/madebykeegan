@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Founders vs Kaiju — v0.2 Playtest</title>
+  <link rel="stylesheet" href="css/game.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">RULES LABORATORY · v0.2</div>
+      <h1>Founders vs Kaiju</h1>
+    </div>
+    <div id="statusStrip" class="status-strip"></div>
+    <div class="top-actions">
+      <button id="newGameBtn">New Game</button>
+      <button id="devToggleBtn" class="secondary">Developer</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="objective-band">
+      <div><strong>Kaiju:</strong> reach City Core and survive the final Response.</div>
+      <div><strong>Washington:</strong> reduce Colossus to 0 Health first.</div>
+    </section>
+
+    <section id="battlefield" class="battlefield" aria-label="Battlefield"></section>
+
+    <section class="player-grid">
+      <article class="player-panel kaiju-panel">
+        <div class="panel-head">
+          <div>
+            <div class="eyebrow">KAIJU</div>
+            <h2>Colossus Rex</h2>
+          </div>
+          <div id="kaijuStats" class="stats"></div>
+        </div>
+        <div id="evolutions" class="evolution-row"></div>
+        <div id="kaijuActions" class="action-row"></div>
+        <div id="kaijuHand" class="hand"></div>
+      </article>
+
+      <article class="player-panel washington-panel">
+        <div class="panel-head">
+          <div>
+            <div class="eyebrow">DEFENDER</div>
+            <h2>Washington</h2>
+          </div>
+          <div id="washingtonStats" class="stats"></div>
+        </div>
+        <div id="washingtonActions" class="action-row"></div>
+        <div id="washingtonHand" class="hand"></div>
+      </article>
+    </section>
+
+    <section class="lower-grid">
+      <article class="log-panel">
+        <div class="panel-head compact">
+          <div><div class="eyebrow">PLAYTEST</div><h2>Action Log</h2></div>
+          <button id="copyLogBtn" class="secondary">Copy Log</button>
+        </div>
+        <div id="log" class="log"></div>
+      </article>
+
+      <aside id="devPanel" class="dev-panel hidden">
+        <div class="panel-head compact"><div><div class="eyebrow">DEBUG</div><h2>Tuning Panel</h2></div></div>
+        <div id="devControls"></div>
+      </aside>
+    </section>
+  </main>
+
+  <div id="overlay" class="overlay hidden">
+    <div id="modal" class="modal"></div>
+  </div>
+
+  <template id="cardTemplate">
+    <div class="game-card">
+      <div class="card-top"><span class="card-id"></span><span class="card-tag"></span></div>
+      <h3 class="card-name"></h3>
+      <div class="card-symbols"></div>
+      <div class="card-copy"></div>
+      <div class="card-buttons"></div>
+    </div>
+  </template>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
