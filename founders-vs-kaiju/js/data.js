@@ -1,0 +1,50 @@
+window.FVK=window.FVK||{};
+FVK.DATA={
+kaijuCards:[
+{id:'K01',name:'Distant Tremor',kind:'core',gate:{force:1,adapt:0},instinct:'Look at top 3; reorder.',manifest:'Awakened: move oldest Wave 1.',strategy:'instinct'},
+{id:'K02',name:'Scent Weakness',kind:'core',gate:{force:0,adapt:1},instinct:'Look at top 3; take an ADAPT card.',manifest:'Return 1 Fortification from next area to Washington hand.',strategy:'instinct'},
+{id:'K03',name:'Gathering Mass',kind:'core',gate:{force:2,adapt:0},instinct:'Draw 2; keep 1, bottom 1.',manifest:'Awakened: immediate Advance; supplies 1 FORCE.',strategy:'body'},
+{id:'K04',name:'Patient Predator',kind:'core',gate:{force:0,adapt:1},instinct:'Look at top 4; reorder.',manifest:'Awakened: if Washington is in next area, move him 1 toward Core.',strategy:'instinct'},
+{id:'K05',name:'Relentless Drive',kind:'core',gate:{force:1,adapt:0},instinct:'Look at top 2; take 1, bottom 1.',manifest:'Awakened: immediate Advance; ignore 1 Gate requirement; suffer 1 after entry.',strategy:'body'},
+{id:'K06',name:'Feint in the Deep',kind:'core',gate:{force:0,adapt:1},instinct:'Look at top 3; bottom 1, reorder rest.',manifest:'Awakened: if next District is Breached, discard 1 Fortification there.',strategy:'instinct'},
+{id:'K07',name:'Violent Surge',kind:'core',gate:{force:1,adapt:0},instinct:'Look at top 3; reorder.',manifest:'Awakened: move every Wave 1; resolve impacts.',strategy:'tide'},
+{id:'K08',name:'Crush the Weak Point',kind:'core',gate:{force:0,adapt:1},instinct:'Look at top 4; put FORCE/ADAPT card on top.',manifest:'Awakened: if next District Breached, Gate -1 and immediate Advance.',strategy:'instinct'},
+{id:'K09',name:'Ancient Memory',kind:'core',gate:{force:1,adapt:1,flex:true},instinct:'Take top discard into hand; bottom 1 card from hand.',manifest:'Return 1 Signature card from discard to hand.',strategy:'instinct'},
+{id:'K10',name:'Unstoppable Momentum',kind:'core',gate:{force:2,adapt:0},instinct:'Draw 1; may bottom 1 to draw 1 more.',manifest:'Awakened: immediate Advance; supplies 1 FORCE; suffer 1 then draw 2.',strategy:'body'},
+{id:'K11',name:'Read the Terrain',kind:'core',gate:{force:0,adapt:2},instinct:'Look at top 5; take an ADAPT card.',manifest:'Awakened: if next area has 2 Fortifications, discard 1.',strategy:'instinct'},
+{id:'K12',name:'Hardened Hide',kind:'core',gate:{force:1,adapt:0},instinct:'Look at top 3; take an Evolution card.',evolution:{slot:'body',strategy:'body',text:'Ignore first Fortification damage when entering each new area.'},strategy:'body'},
+{id:'K13',name:'Broken Chains',kind:'signature',tags:['TIDE'],gate:{force:2,adapt:0},instinct:'Look at top 3; take FORCE or TIDE.',manifest:'Awakened: immediate Advance; supplies FORCE/FORCE.',evolution:{slot:'head',strategy:'body',text:'Force routes require 1 fewer FORCE, minimum 1.'},strategy:'body'},
+{id:'K14',name:'Deep Current',kind:'signature',tags:['TIDE'],gate:{force:0,adapt:1},instinct:'Look at top 4; put a TIDE card on top.',manifest:'Awakened: move every Wave 1.',evolution:{slot:'tail',strategy:'tide',text:'When a Wave Breaches a District with 2 Fortifications, Kaiju chooses which is lost.'},strategy:'tide'},
+{id:'K15',name:'Rising Water',kind:'signature',tags:['TIDE'],gate:{force:0,adapt:1},instinct:'Draw 2; keep 1, bottom 1.',manifest:'Awakened: move 1 Wave; if it Breaches a District, draw 1.',strategy:'tide'},
+{id:'K16',name:'Imperial Roar',kind:'signature',tags:['TIDE'],gate:{force:1,adapt:0},instinct:'Look at top 3; take a Core card.',manifest:'Awakened: push Washington 1 toward Core if nearby.',evolution:{slot:'head',strategy:'instinct',text:'Instinct look effects look at 1 additional card.'},strategy:'instinct'},
+{id:'K17',name:'Tidal Carapace',kind:'signature',tags:['TIDE'],gate:{force:1,adapt:0},instinct:'Look at top 4; take an Evolution card.',manifest:'Discard 1 installed Evolution to restore 1 Health.',evolution:{slot:'body',strategy:'body',text:'Once each Advance, discard 1 card instead of suffering 1 Overrun Health.'},strategy:'body'},
+{id:'K18',name:'Undertow Engine',kind:'signature',tags:['TIDE'],gate:{force:0,adapt:2},instinct:'Look at top 5; take a TIDE card.',manifest:'Awakened: if a Wave is in next area, immediate Advance and Gate -1.',evolution:{slot:'tail',strategy:'tide',text:'New Wave immediately moves 1 after successful Advance.'},strategy:'tide'}
+],
+washingtonCards:[
+{id:'W01',name:'Harbor Chain',command:'Destroy 1 Wave in Washington area.',fortify:{type:'TAX',gateShaper:true,text:'+1 FORCE here; discard after Kaiju enters.'}},
+{id:'W02',name:'Earthwork Redoubt',command:'Restore current Breached District to Fortified.',fortify:{type:'DIVERT',gateShaper:true,text:'FORCE -1 / ADAPT +1; Force entry deals 1.'}},
+{id:'W03',name:'Coastal Battery',command:'Deal 1 to revealed Kaiju same/adjacent, not Approach.',fortify:{type:'HURT',text:'Force entry deals 1; discard.'}},
+{id:'W04',name:'Powder Magazine',command:'Destroy 1 Wave here; Breach District if applicable.',fortify:{type:'TRAP',text:'If Kaiju Overruns entering here, deal +1; discard.'}},
+{id:'W05',name:'Field Barricades',command:'Move 1 Fortification inward.',fortify:{type:'TAX',text:'After entry discard 1 card or suffer 1; discard.'}},
+{id:'W06',name:'False Works',command:'Return 1 Fortification here to hand; draw 1.',fortify:{type:'DIVERT',gateShaper:true,text:'ADAPT -1 / FORCE +1.'}},
+{id:'W07',name:'Chevaux-de-Frise',command:'Destroy a Wave at Breach while Washington at Breach/DII.',fortify:{type:'TRAP',text:'Adapt entry: discard 1 or suffer 1; discard.'}},
+{id:'W08',name:'Signal Beacon',command:'Look at top 2 Kaiju cards.',fortify:{type:'SUPPORT',text:'First Signature nearby: draw 1; discard.'}},
+{id:'W09',name:'Forced March',command:'Move Washington up to 2 areas.',fortify:{type:'FALLBACK',text:'When Kaiju enters, Washington may move inward 1; discard.'}},
+{id:'W10',name:'Emergency Repairs',command:'Restore current Breached District to Fortified.',fortify:{type:'ENGINEERS',text:'Prevent a Wave impact here; discard.'}},
+{id:'W11',name:'Continental Volley',command:'Deal 1 to revealed Kaiju same/adjacent, not Approach.',fortify:{type:'CROSSFIRE',text:'On entry, if Washington same/adjacent, deal 1; discard.'}},
+{id:'W12',name:'Orderly Retreat',command:'Move Washington inward 1; return old Fortification to hand.',fortify:{type:'FALLBACK',text:'When District Ruined, move Washington and 1 Fortification inward; discard.'}},
+{id:'W13',name:'Scorched Ground',command:'If sharing District with Kaiju, Ruin it, deal 2, retreat inward.',fortify:{type:'TRAP',text:'Kaiju enters Breached District: may Ruin it to deal 2; discard.'}},
+{id:'W14',name:'Benjamin Franklin',command:'Look top 3 Washington cards; take 1, bottom rest.',fortify:{type:'SUPPORT',text:'Rally here looks at 3 instead of 2.'}},
+{id:'W15',name:'Henry Knox',command:'Draw 2, discard 1.',fortify:{type:'SUPPORT',text:'Discard on Strike for adjacent range and +1 damage.'}},
+{id:'W16',name:'Marquis de Lafayette',command:'Move 1; may Fortify new area free.',fortify:{type:'SUPPORT',text:'On Kaiju entry, move Washington adjacent before entry effects; discard.'}},
+{id:'W17',name:'Abigail Adams',command:'Draw 2, keep 1; top/bottom other.',fortify:{type:'SUPPORT',text:'Wave Breaches District: draw 2 keep 1; discard.'}},
+{id:'W18',name:'John Paul Jones',command:'Destroy a Wave at Breach/DII while Washington there.',fortify:{type:'SUPPORT',text:'When Wave enters here, destroy it before impact; discard.'}}
+],
+districts:[
+{id:'D01',name:'Harbor Batteries',gate:{force:3,adapt:2},ability:'Force entry deals 1 Health.'},
+{id:'D02',name:'Fortified Heights',gate:{force:4,adapt:2},ability:'Adapt entry discards 1 extra card.'},
+{id:'D03',name:'River Crossing',gate:{force:2,adapt:3},ability:'Wave Breach also discards 1 Fortification.'},
+{id:'D04',name:'Arsenal Quarter',gate:{force:2,adapt:3},ability:'Washington here may Strike adjacent Kaiju.'},
+{id:'D05',name:'Market Ward',gate:{force:2,adapt:2},ability:'First Breach: Washington draws 2, keeps 1.'},
+{id:'D06',name:'Woodland Road',gate:{force:3,adapt:2},ability:'Adapt entry may pull adjacent Washington into Road.'}
+]};
