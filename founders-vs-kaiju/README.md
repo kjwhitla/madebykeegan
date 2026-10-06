@@ -1,95 +1,125 @@
-# Founders vs Kaiju — HTML Playtest Prototype
+# Founders vs Kaiju — HTML Playtest Prototype v0.2
 
-A dependency-free browser prototype for **Founders vs Kaiju v0.2**, built as a rules laboratory for two-player hot-seat testing.
+A dependency-free, two-player hot-seat rules laboratory for **Founders vs Kaiju**.
+
+This branch is the **Complete Rules Fidelity + Playtest UX** engineering pass. It exists to test the tabletop rules, not to turn the design into a videogame.
 
 ## Source of truth
 
-Working rules: https://docs.google.com/document/d/18ejLHNDICC6FqyYkDY0M6WA-e3Yj3fDf3GUoe9NFqZk/edit
+Working tabletop rules:  
+https://docs.google.com/document/d/18ejLHNDICC6FqyYkDY0M6WA-e3Yj3fDf3GUoe9NFqZk/edit
 
-The core design contract is:
+Core geometry:
 
-> The Kaiju cannot win without making itself easier to kill.
+> **Distance to Core vs Distance to Death.**
 
-Washington shapes costs and geography. Colossus races inward while managing cards, Health, Waves, Evolutions, and exposure.
+The Kaiju advances through a Linear Race while Washington advances through a Conquest Race. Progress should create exposure.
 
 ## Run it
 
-No build step is required.
-
-For the most reliable browser behavior, serve the repository locally:
+Serve the repository over HTTP because the v0.2 prototype assembles its rules/UI bundles from local text fragments:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:8080/founders-vs-kaiju/
 ```
 
-If this repository is served by GitHub Pages, the same folder can be used as a static page.
+Do not rely on opening `index.html` directly from `file://`.
 
-## Implemented
+## v0.2 engineering goals
 
-- Interactive 3-District reveal / Washington + Kaiju District draft
-- Seeded 18-card Kaiju and 18-card Washington decks
-- Dormant opening and 2-TIDE Awakening
-- Kaiju Instinct / Manifest modes
-- Force / Adapt Gates and deliberate card payment
-- Overrun Health payment
-- District Fortified → Breached → Ruined state
-- Fortification capacity and Gate-shaper limits
-- Three-Wave lifecycle and Core pressure
-- Washington two-action responses
-- Geographic Strike / Exposure rules
-- Head / Body / Tail Evolutions
-- Finite deck depletion
-- City Core final Response and win conditions
-- Action log and structured event data
-- End-game metrics + JSON export
-- Seed replay and basic debug/tuning controls
+### 1. Rules fidelity
 
-## Prototype architecture
+The old MVP could display all card text while simplifying several effects internally. v0.2 treats that as unsafe for balance testing.
+
+The branch now has explicit resolution paths for K01–K18, W01–W18, the six Districts, Gate payment, Overrun, Waves, Fortifications, Exposure, Evolutions, finite decks, and City Core victory.
+
+See **IMPLEMENTATION_MATRIX.md** before treating an edge-case result as balance evidence.
+
+### 2. Playtest UX
+
+The interface now emphasizes decisions rather than presentation polish:
+
+- current-decision helper;
+- legal/illegal action feedback;
+- Force vs Adapt preview;
+- explicit Gate-card payment;
+- Overrun Health preview;
+- deterministic card-order choices;
+- Fortification replacement choices;
+- optional trigger prompts;
+- Hand / Deck / Discard visibility;
+- Head / Body / Tail Evolution slots;
+- reproducible seeds;
+- end-game metrics;
+- JSON export;
+- moment markers: **Tense / Obvious / Confusing**.
+
+### 3. Instrumentation
+
+The game records:
+
+- winner and exchanges;
+- first exchange Awakening was possible;
+- actual Awakening exchange;
+- Dormant Acts;
+- Health entering Breach / DII / DI / Core;
+- Force vs Adapt;
+- Overrun Health;
+- Strikes and damage;
+- Evolutions installed/replaced;
+- Waves created/destroyed/Breaches;
+- Fortifications installed/replaced;
+- Rally / Command usage;
+- Body / Tide / Instinct behavioral counts;
+- deck depletion;
+- playtester Tense / Obvious / Confusing markers.
+
+## Architecture
 
 ```text
 founders-vs-kaiju/
   index.html
+  README.md
+  IMPLEMENTATION_MATRIX.md
+  KNOWN_LIMITATIONS.md
+  RULES_QUESTIONS.md
+
   css/
     game.css
+    v02.css
+
   js/
     config.js
     data.js
-    engine.js
-    ui.js
-    app.js
+    bootstrap-v02.js
+    ui-bootstrap-v02.js
+    app-v02.js
+
+    engine-v02/
+      part-00.txt ... part-05.txt
+
+    ui-v02/
+      part-00.txt ... part-02.txt
 ```
 
-`engine.js` owns authoritative state. UI handlers call engine actions rather than mutating state directly.
+The v0.2 engine/UI are split into runtime fragments only to make connector-based iteration manageable. They should be consolidated into normal JavaScript modules once this branch is stable.
 
-## Playtest metrics
+## What not to build yet
 
-The prototype records winner, exchange count, Awakening timing, Health by location, Force/Adapt choices, Overrun, Waves, Strikes, Fortifications, Rally use, deck depletion, Evolutions, and approximate Body / Tide / Instinct behavior.
+No AI, networking, accounts, campaign, deck construction, additional Kaiju, art pipeline, sound, or animation-heavy combat.
 
-Use **Download JSON** after a game to save the full state, action log, and summary.
+The question is still:
 
-## Debug / tuning panel
+> **Where do players lean forward, regret a choice, pivot strategy, or become bored?**
 
-The Developer panel supports seed replay, Health/position overrides, Wave injection, phase skipping, JSON export, and major starting-value changes before a new game.
+## Known engineering risks
 
-Core numbers are centralized in `js/config.js`.
+Remaining issues are mostly nested trigger-ordering cases, not missing strategic systems. See **KNOWN_LIMITATIONS.md**.
 
-## Current implementation notes
-
-This is an early functional prototype, not a production adaptation. A few nested card-resolution edge cases remain implementation-tuning items rather than structural design gaps. See `RULES_QUESTIONS.md` and `KNOWN_LIMITATIONS.md`.
-
-## Design discipline
-
-Prefer this correction order:
-
-1. tune a card's opportunity cost or value;
-2. tune Gate / Health / hand / Exposure values;
-3. replace a problematic card effect;
-4. only then consider a subsystem change.
-
-The next job of this prototype is to answer: **where do players lean forward, regret a choice, pivot strategy, or become bored?**
+Do not redesign the board game to compensate for a software implementation bug.
