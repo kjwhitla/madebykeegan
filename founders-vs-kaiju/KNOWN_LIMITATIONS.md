@@ -1,11 +1,15 @@
-# Known Prototype Limitations
+# Known Prototype Limitations — HTML v0.2
 
-This first HTML build is intended to get real games running quickly.
+The rules-fidelity branch closes most of the original “text exists but behavior is simplified” gap.
 
-1. **Nested draw-selection triggers.** Market Ward and Abigail Adams Wave triggers currently prioritize state integrity over a bespoke multi-step selection UI. Verify their digital card-selection sequence against the tabletop wording before balance testing those specific cards.
-2. **Orderly Retreat on Ruin.** The tabletop card can move another Fortification inward as the District falls. The first build preserves Washington's fallback movement but needs a dedicated nested-choice flow for moving the companion Fortification cleanly.
-3. **Lafayette free Fortify at a full destination.** Normal free-Fortify works; replacement-at-capacity after the free move should receive a targeted regression test.
-4. **Complex simultaneous Wave triggers.** Multiple Waves plus several reactive Fortifications can create nested choices. The engine resolves deterministic effects in sequence, but these combinations need focused regression tests.
-5. **Tuning controls.** Major starting values are editable in the Developer panel; per-District Gate editing can be added once repeated tests show it is useful.
+Remaining limitations are primarily **nested trigger ordering**:
 
-These are implementation limitations, not invitations to redesign the game.
+1. **Multiple simultaneous Wave reactions.** W10, W17, W18, K14 and District Breach effects need regression tests when several could fire during the same Wave movement.
+2. **Orderly Retreat on Ruin.** Washington's fallback movement is implemented. Moving a companion Fortification inward while the same Ruin event is removing defenses still needs exact nested-choice handling.
+3. **Lafayette at full capacity.** Free Fortify and entry movement are implemented; replacement-at-capacity needs a dedicated regression case.
+4. **Nested hand-limit decisions.** The engine supports finite hand limits, but draw/return effects that immediately create another choice need focused tests.
+5. **Trigger ordering UI.** The engine currently resolves the deterministic order encoded in the prototype. It does not yet ask the player to order two optional simultaneous triggers.
+
+These are **software fidelity issues**, not open board-game design questions.
+
+See `IMPLEMENTATION_MATRIX.md` before using a specific interaction as balance evidence.
