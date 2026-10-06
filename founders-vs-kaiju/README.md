@@ -4,6 +4,8 @@ A dependency-free, two-player hot-seat rules laboratory for **FVCK! — Founders
 
 This branch is the **Complete Rules Fidelity + Playtest UX** engineering pass. It exists to test the tabletop rules, not to turn the design into a videogame.
 
+**Current status:** P0 rules fidelity and P1 FVCK presentation are complete for the first human playtest build. The active next phase is a 5–10 game rules freeze.
+
 ## Source of truth
 
 Working tabletop rules:  
