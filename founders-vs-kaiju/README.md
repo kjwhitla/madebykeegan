@@ -1,6 +1,6 @@
-# Founders vs Kaiju — HTML Playtest Prototype v0.2
+# FVCK! — Founders vs Colossal Kaiju — HTML Playtest Prototype v0.2
 
-A dependency-free, two-player hot-seat rules laboratory for **Founders vs Kaiju**.
+A dependency-free, two-player hot-seat rules laboratory for **FVCK! — Founders vs Colossal Kaiju**.
 
 This branch is the **Complete Rules Fidelity + Playtest UX** engineering pass. It exists to test the tabletop rules, not to turn the design into a videogame.
 
@@ -8,6 +8,16 @@ This branch is the **Complete Rules Fidelity + Playtest UX** engineering pass. I
 
 Working tabletop rules:  
 https://docs.google.com/document/d/18ejLHNDICC6FqyYkDY0M6WA-e3Yj3fDf3GUoe9NFqZk/edit
+
+## Working story identity
+
+**FVCK!** is a cadence, not a rage fantasy.
+
+Washington stays composed and recognizably historical while the situation becomes increasingly impossible around him. The Kaiju owns scale; Washington owns resolve. The central visual/story beat is simply that **the Colossal Kaiju is getting closer**.
+
+The cadence may accelerate as the Kaiju advances, but it is presentation only—not a resource, timer, or new mechanic.
+
+See **NEXT_DEV.md** for the engineering and playtest roadmap.
 
 Core geometry:
 
