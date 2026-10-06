@@ -34,7 +34,7 @@ function resolveChoice(v){const c=s.choice;if(!c)return;const one=Array.isArray(
  case'k09_retrieve_signature':{const i=s.kaiju.discard.lastIndexOf(one);if(i>=0){s.kaiju.discard.splice(i,1);s.kaiju.hand.push(one);limit('kaiju')}}break;
  case'k02_return_fort':removeFort(c.loc,one,true);limit('washington');break;
  case'k06_discard_fort':case'k11_discard_fort':removeFort(c.loc,one);break;
- case'k15_move_wave':{const w=s.waves.active.find(x=>x.name===one),before=area(inward(w.location))?.state;moveWave(w);if(w&&['district1','district2'].includes(w.location)&&before==='fortified')draw('kaiju',1);break}
+ case'k15_move_wave':{const w=s.waves.active.find(x=>x.name===one);moveWave(w,{source:'K15'});break}
  case'k17_sac_evo':{const id=s.kaiju.evolutions[one];if(id){s.kaiju.evolutions[one]=null;s.kaiju.discard.push(id);heal(1)}}break;
  case'k14_choose_fort_loss':case'breach_capacity_loss':case'd03_discard_fort':removeFort(c.loc,one);break;
  case'w12_move_companion':moveFortification(c.loc,c.dest,one);break;
