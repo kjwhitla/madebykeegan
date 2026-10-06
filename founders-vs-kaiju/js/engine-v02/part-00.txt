@@ -1,0 +1,45 @@
+window.FVK=window.FVK||{};
+FVK.Engine=(()=>{
+const L=['approach','breach','district2','district1','cityCore'];
+let s=null,subs=[];
+const inward=x=>L[Math.min(L.indexOf(x)+1,4)];
+const outward=x=>L[Math.max(L.indexOf(x)-1,0)];
+const adj=(a,b)=>Math.abs(L.indexOf(a)-L.indexOf(b))===1;
+const card=id=>FVK.DATA.kaijuCards.find(x=>x.id===id)||FVK.DATA.washingtonCards.find(x=>x.id===id);
+const district=id=>FVK.DATA.districts.find(x=>x.id===id);
+const area=loc=>s.battlefield[loc];
+function emit(){subs.forEach(f=>f(s))}
+function subscribe(f){subs.push(f)}
+function log(type,message,data={}){s.log.push({exchange:s.exchange,phase:s.phase,type,message,...data})}
+function rng(seed){let h=2166136261;for(const c of seed)h=Math.imul(h^c.charCodeAt(0),16777619);return()=>{h+=0x6D2B79F5;let t=h;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(a,r){a=[...a];for(let i=a.length-1;i;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(seed='FVSK-'+Math.floor(Date.now()/1000)){
+ const r=rng(seed),revealed=shuffle(FVK.DATA.districts.map(x=>x.id),r).slice(0,3);
+ s={seed,exchange:1,phase:'setup_washington_district',winner:null,setup:{revealed,d1:null,d2:null},
+ kaiju:{dormant:true,health:null,location:'approach',hand:[],deck:shuffle(FVK.DATA.kaijuCards.map(x=>x.id),r),discard:[],evolutions:{head:null,body:null,tail:null}},
+ washington:{location:'district1',hand:[],deck:shuffle(FVK.DATA.washingtonCards.map(x=>x.id),r),discard:[],actions:0},
+ battlefield:{approach:{label:'Approach',state:'fixed',forts:[]},breach:{label:'Breach',state:'fixed',forts:[]},district2:{label:'District II',state:'fortified',forts:[],districtId:null,marketWardTriggered:false},district1:{label:'District I',state:'fortified',forts:[],districtId:null,marketWardTriggered:false},cityCore:{label:'City Core',state:'fixed',forts:[],coreBreached:false}},
+ waves:{supply:Array.from({length:FVK.CONFIG.waveSupply},(_,i)=>`Wave ${i+1}`),active:[],destroyed:[]},pending:null,choice:null,activeAction:null,finalResponse:false,
+ log:[],metrics:{awakening:null,firstAwakenCapable:null,dormantActs:0,healthByEntry:{breach:null,district2:null,district1:null,cityCore:null},routes:{force:0,adapt:0,overrun:0},strikes:0,strikeDamage:0,evolutions:0,evolutionsReplaced:0,wavesCreated:0,wavesDestroyed:0,wavesBreached:0,fortificationsInstalled:0,fortificationsReplaced:0,rallies:0,commands:0,instinctActs:0,manifestActs:0,bodyBehaviors:0,tideBehaviors:0,instinctBehaviors:0,feedback:{tense:0,obvious:0,confusing:0}},depletion:{kaiju:null,washington:null}};
+ log('setup','Game created with seed '+seed);emit();return s
+}
+function chooseDistrict(id){if(!s.setup.revealed.includes(id))return;if(s.phase==='setup_washington_district'){s.setup.d1=id;area('district1').districtId=id;s.phase='setup_kaiju_district';log('setup','Washington chose '+district(id).name+' for District I.')}else if(s.phase==='setup_kaiju_district'&&id!==s.setup.d1){s.setup.d2=id;area('district2').districtId=id;draw('kaiju',FVK.CONFIG.kaijuStartingHand);draw('washington',FVK.CONFIG.washingtonStartingHand);s.phase='kaiju_act';log('setup','Kaiju chose '+district(id).name+' for District II.')}emit()}
+function noteDepletion(who){if(!s[who].deck.length&&!s.depletion[who]){s.depletion[who]={exchange:s.exchange,location:s.kaiju.location};log('depletion',`${who} deck depleted.`)}}
+function rawDraw(who,n=1){const p=s[who],ids=[];for(let i=0;i<n&&p.deck.length;i++){const id=p.deck.shift();p.hand.push(id);ids.push(id)}noteDepletion(who);return ids}
+function draw(who,n=1){rawDraw(who,n);limit(who)}
+function look(who,n){const p=s[who];if(who==='kaiju'&&s.kaiju.evolutions.head==='K16')n++;return p.deck.splice(0,Math.min(n,p.deck.length))}
+function putBottom(who,ids){s[who].deck.push(...ids)}
+function putTop(who,ids){s[who].deck.unshift(...ids)}
+function limit(who){const p=s[who],max=who==='kaiju'?FVK.CONFIG.kaijuHandLimit:FVK.CONFIG.washingtonHandLimit;if(p.hand.length>max){s.choice={kind:'multi',who,count:p.hand.length-max,ids:[...p.hand],purpose:'hand_limit',prompt:`Discard ${p.hand.length-max} card(s) to hand limit.`};return true}return false}
+function discard(who,id){const p=s[who],i=p.hand.indexOf(id);if(i>=0){p.hand.splice(i,1);p.discard.push(id);return true}return false}
+function discardInstalled(id){for(const loc of L){const a=area(loc),i=a.forts.indexOf(id);if(i>=0){a.forts.splice(i,1);s.washington.discard.push(id);return true}}return false}
+function removeFort(loc,id,toHand=false){const a=area(loc),i=a.forts.indexOf(id);if(i<0)return false;a.forts.splice(i,1);(toHand?s.washington.hand:s.washington.discard).push(id);if(toHand)limit('washington');return true}
+function canAwaken(){const ok=s.kaiju.dormant&&s.kaiju.hand.filter(id=>(card(id).tags||[]).includes('TIDE')).length>=FVK.CONFIG.awakeningTideCost;if(ok&&!s.metrics.firstAwakenCapable)s.metrics.firstAwakenCapable=s.exchange;return ok}
+function awaken(ids){if(!ids){s.choice={kind:'multi',who:'kaiju',count:FVK.CONFIG.awakeningTideCost,ids:s.kaiju.hand.filter(id=>(card(id).tags||[]).includes('TIDE')),purpose:'awaken',prompt:`Choose ${FVK.CONFIG.awakeningTideCost} TIDE cards to Awaken.`};emit();return}ids.forEach(id=>discard('kaiju',id));s.choice=null;s.kaiju.dormant=false;s.kaiju.health=FVK.CONFIG.kaijuHealth;s.metrics.awakening=s.exchange;createWave(false);draw('kaiju',1);log('awaken','Colossus Rex Awakens.');toWashington();emit()}
+function toWashington(){s.activeAction=null;s.phase='washington_response';s.washington.actions=FVK.CONFIG.washingtonActions}
+function endWashingtonAction(){s.activeAction=null;s.washington.actions--;if(s.winner)return;if(s.washington.actions<=0){if(s.finalResponse){if(s.kaiju.health>0){s.winner='kaiju';s.phase='game_over';log('victory','Kaiju survives the final Response.')}}else{draw('washington',1);if(!s.choice)s.phase='kaiju_adapt'}}}
+function completeKaijuAct(){s.activeAction=null;toWashington()}
+function endAdapt(){s.exchange++;s.phase='kaiju_act';emit()}
+function damage(n,src,{ignoreApproach=false}={}){if(s.kaiju.dormant||(!ignoreApproach&&s.kaiju.location==='approach'))return false;s.kaiju.health-=n;s.metrics.strikeDamage+=src==='Strike'?n:0;log('damage',src+' deals '+n+' Health.');if(s.kaiju.health<=0){s.kaiju.health=0;s.winner='washington';s.phase='game_over';log('victory','Washington wins.')}return true}
+function heal(n){if(s.kaiju.dormant)return;s.kaiju.health=Math.min(FVK.CONFIG.kaijuHealth,s.kaiju.health+n)}
+function baseGate(loc){
