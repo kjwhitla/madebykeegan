@@ -1,0 +1,42 @@
+apacity. Choose a Fortification to replace.'};emit();return}installFort(id,s.washington.location);endWashingtonAction();emit();return}discard('washington',id);s.metrics.commands++;log('command',c.name+' Command.',{card:id});resolveCommand(id);if(!s.choice&&!s.winner&&s.activeAction)endWashingtonAction();emit()}
+function installFort(id,loc){discard('washington',id);const a=area(loc);a.forts.push(id);s.metrics.fortificationsInstalled++;log('fortify',card(id).name+' Fortifies '+a.label+'.',{card:id,location:loc})}
+function resolveCommand(id){const loc=s.washington.location,a=area(loc);switch(id){
+case'W01':{const waves=s.waves.active.filter(w=>w.location===loc);if(waves.length)s.choice={kind:'pick',who:'washington',ids:waves.map(w=>w.name),purpose:'destroy_wave_here',source:'Harbor Chain',prompt:'Harbor Chain: choose a Wave here to destroy.'};break}
+case'W02':case'W10':if(['district1','district2'].includes(loc)&&a.state==='breached')a.state='fortified';break;
+case'W03':case'W11':if(!s.kaiju.dormant&&s.kaiju.location!=='approach'&&(s.kaiju.location===loc||adj(s.kaiju.location,loc)))damage(1,card(id).name);break;
+case'W04':{const waves=s.waves.active.filter(w=>w.location===loc);if(waves.length)destroyWave(waves[0],'Powder Magazine');if(['district1','district2'].includes(loc)&&a.state==='fortified')breachDistrict(loc);break}
+case'W05':if(a.forts.length)s.choice={kind:'pick',who:'washington',ids:[...a.forts],purpose:'w05_move_fort',loc,prompt:'Field Barricades: choose a Fortification to move inward.'};break;
+case'W06':if(a.forts.length)s.choice={kind:'pick',who:'washington',ids:[...a.forts],purpose:'w06_return_fort',loc,prompt:'False Works: choose a Fortification here to return to hand.'};break;
+case'W07':{if(['breach','district2'].includes(loc)){const waves=s.waves.active.filter(w=>w.location==='breach');if(waves.length)destroyWave(waves[0],'Chevaux-de-Frise')}break}
+case'W08':{const seen=s.kaiju.deck.slice(0,2);s.choice={kind:'info',who:'washington',ids:seen,purpose:'w08_peek',prompt:'Signal Beacon: top 2 Kaiju cards, same order.'};break}
+case'W09':s.choice={kind:'pick',who:'washington',ids:['inward-1','inward-2','outward-1','outward-2'],purpose:'w09_move',prompt:'Forced March: move Washington up to 2 areas.'};break;
+case'W12':{const old=loc;s.washington.location=inward(loc);if(a.forts.length)s.choice={kind:'pick',who:'washington',ids:[...a.forts],purpose:'w12_return_fort',loc:old,prompt:'Orderly Retreat: choose a Fortification in the old area to return to hand.'};break}
+case'W13':if(['district1','district2'].includes(loc)&&s.kaiju.location===loc){ruinDistrict(loc);damage(2,'Scorched Ground');s.washington.location=inward(loc)}break;
+case'W14':{const seen=look('washington',3);s.choice={kind:'pick',who:'washington',ids:seen,purpose:'w14_take_bottom',seen,prompt:'Benjamin Franklin: choose 1 card to keep; bottom the rest.'};break}
+case'W15':rawDraw('washington',2);if(s.washington.hand.length)s.choice={kind:'multi',who:'washington',count:1,ids:[...s.washington.hand],purpose:'w15_discard_one',prompt:'Henry Knox: discard 1 card.'};break;
+case'W16':s.choice={kind:'area',who:'washington',ids:L.filter(x=>x!=='approach'&&adj(x,loc)),purpose:'w16_command_move',prompt:'Lafayette: move Washington 1 area, then you may Fortify there for free.'};break;
+case'W17':{const seen=s.washington.deck.splice(0,Math.min(2,s.washington.deck.length));noteDepletion('washington');if(seen.length===1){s.washington.hand.push(seen[0]);limit('washington')}else if(seen.length===2)s.choice={kind:'pick',who:'washington',ids:seen,purpose:'w17_choose_keep',seen,prompt:'Abigail Adams: choose 1 drawn card to keep.'};break}
+case'W18':{if(['breach','district2'].includes(loc)){const waves=s.waves.active.filter(w=>['breach','district2'].includes(w.location));if(waves.length)s.choice={kind:'pick',who:'washington',ids:waves.map(w=>w.name),purpose:'destroy_wave_any',source:'John Paul Jones',prompt:'John Paul Jones: choose a Wave at Breach or District II to destroy.'}}break}
+}}
+function resolveChoice(v){const c=s.choice;if(!c)return;const one=Array.isArray(v)?v[0]:v;
+ if(c.kind==='multi'&&c.purpose==='awaken')return awaken(v);
+ if(c.purpose==='hand_limit'){v.forEach(id=>discard(c.who,id));s.choice=null;resume();emit();return}
+ switch(c.purpose){
+ case'reorder_top':case'order_rest_top':putTop(c.who,v);break;
+ case'keep_one_bottom_rest':s[c.who].hand.push(one);putBottom(c.who,c.seen.filter(x=>x!==one));limit(c.who);break;
+ case'take_adapt_bottom_rest':case'take_evolution_bottom_rest':case'take_core_bottom_rest':case'take_tide_bottom_rest':s[c.who].hand.push(one);putBottom(c.who,c.seen.filter(x=>x!==one));limit(c.who);break;
+ case'k13_take_reorder_rest':s.kaiju.hand.push(one);{const rest=c.seen.filter(x=>x!==one);if(rest.length>1){s.choice={kind:'order',who:'kaiju',ids:rest,purpose:'order_rest_top',prompt:'Order the remaining cards. First selected returns on top.'};emit();return}else putTop('kaiju',rest)}break;
+ case'k17_take_reorder_rest':s.kaiju.hand.push(one);{const rest=c.seen.filter(x=>x!==one);if(rest.length>1){s.choice={kind:'order',who:'kaiju',ids:rest,purpose:'order_rest_top',prompt:'Order the remaining cards. First selected returns on top.'};emit();return}else putTop('kaiju',rest)}break;
+ case'k06_bottom_one':putBottom('kaiju',[one]);putTop('kaiju',c.seen.filter(x=>x!==one));break;
+ case'k08_top_symbol':putTop('kaiju',[one]);putBottom('kaiju',c.seen.filter(x=>x!==one));break;
+ case'k09_bottom_hand':{const i=s.kaiju.hand.indexOf(one);if(i>=0){s.kaiju.hand.splice(i,1);putBottom('kaiju',[one])}}break;
+ case'k14_tide_top':putTop('kaiju',[one,...c.seen.filter(x=>x!==one)]);break;
+ case'k09_retrieve_signature':{const i=s.kaiju.discard.lastIndexOf(one);if(i>=0){s.kaiju.discard.splice(i,1);s.kaiju.hand.push(one);limit('kaiju')}}break;
+ case'k02_return_fort':removeFort(c.loc,one,true);break;
+ case'k06_discard_fort':case'k11_discard_fort':removeFort(c.loc,one);break;
+ case'k15_move_wave':{const w=s.waves.active.find(x=>x.name===one),before=area(inward(w.location))?.state;moveWave(w);if(w&&['district1','district2'].includes(w.location)&&before==='fortified')draw('kaiju',1);break}
+ case'k17_sac_evo':{const id=s.kaiju.evolutions[one];if(id){s.kaiju.evolutions[one]=null;s.kaiju.discard.push(id);heal(1)}}break;
+ case'k14_choose_fort_loss':removeFort(c.loc,one);break;
+ case'd02_extra_discard':discard('kaiju',one);break;
+ case'replace_fort':removeFort(c.loc,one);s.metrics.fortificationsReplaced++;installFort(c.newFort,c.loc);break;
+ case'destr
