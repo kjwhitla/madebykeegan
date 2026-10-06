@@ -1,6 +1,6 @@
 window.FVK = window.FVK || {};
 FVK.CONFIG = {
-  version: '0.2-prototype',
+  version: '0.2-rules-fidelity',
   seed: null,
   kaijuHealth: 4,
   kaijuStartingHand: 4,
