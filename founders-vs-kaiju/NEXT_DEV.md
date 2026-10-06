@@ -16,7 +16,18 @@ The engine now pauses and resumes explicit trigger steps instead of continuing r
 
 Two non-structural wording conventions remain in `RULES_QUESTIONS.md`.
 
-**ACTIVE NEXT: P1 — FVCK! story / playtest UX.**
+**P1 — FVCK! Story / Playtest UX: COMPLETE for the first human playtest build.**
+
+Implemented:
+
+- FVCK! / Founders vs Colossal Kaiju brand lockup;
+- location-based cadence that accelerates from Approach to City Core;
+- restrained Washington language: “Hold the line,” “Keep pace,” and “One more Response”;
+- a presentation-only **COLOSSUS IS CLOSER.** notice after successful Advance;
+- the notice clears on Washington's first response action;
+- battlefield stage hierarchy increases toward City Core without changing rules.
+
+**ACTIVE NEXT: P2 — freeze gameplay and run the first 5–10 human playtests.**
 
 ---
 
@@ -145,7 +156,7 @@ Do not pick an arbitrary hidden order.
 
 ---
 
-# P1 — FVCK! STORY / PLAYTEST UX
+# P1 — COMPLETE: FVCK! STORY / PLAYTEST UX
 
 Once P0 is stable, update the prototype presentation.
 
